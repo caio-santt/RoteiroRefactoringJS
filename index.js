@@ -1,8 +1,9 @@
 const { readFileSync } = require('fs');
 const { formatarMoeda } = require('./util');
+const RepositorioPecas   = require('./repositorioPecas');
 const ServicoCalculoFatura = require('./servicoCalculoFatura');
 
-// --- Funções de apresentação, desacopladas do cálculo ---
+// --- Funções de apresentação (texto e HTML) ---
 
 function gerarFaturaStr(fatura, calc) {
   let totalFatura = 0;
@@ -40,17 +41,12 @@ function gerarFaturaHTML(fatura, calc) {
   return html;
 }
 
-// --- Setup dos dados e do serviço de cálculo ---
+// --- Setup dos dados e das classes ---
 
 const fatura = JSON.parse(readFileSync('./faturas.json'));
 const pecas   = JSON.parse(readFileSync('./pecas.json'));
 
-// “Repositório” mínimo para expor getPeca ao serviço
-const repo = {
-  getPeca: (apre) => pecas[apre.id]
-};
-
-// Instância do serviço de cálculo
+const repo = new RepositorioPecas(pecas);
 const calc = new ServicoCalculoFatura(repo);
 
 // --- Impressão das saídas ---
