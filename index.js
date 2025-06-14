@@ -1,36 +1,34 @@
 const { readFileSync } = require('fs');
 
+// === Função movida para o topo ===
+function calcularTotalApresentacao(apre, pecas) {
+    const peca = pecas[apre.id];
+    let total = 0;
+    switch (peca.tipo) {
+        case "tragedia":
+            total = 40000;
+            if (apre.audiencia > 30)
+                total += 1000 * (apre.audiencia - 30);
+            break;
+        case "comedia":
+            total = 30000;
+            if (apre.audiencia > 20)
+                total += 10000 + 500 * (apre.audiencia - 20);
+            total += 300 * apre.audiencia;
+            break;
+        default:
+            throw new Error(`Peça desconhecida: ${peca.tipo}`);
+    }
+    return total;
+}
+
 function gerarFaturaStr(fatura, pecas) {
     let totalFatura = 0;
     let creditos    = 0;
     let faturaStr   = `Fatura ${fatura.cliente}\n`;
 
     // query para obter dados da peça
-    function getPeca(apre) {
-        return pecas[apre.id];
-    }
-
-    // calcula valor de uma apresentação
-    function calcularTotalApresentacao(apre) {
-        const peca = getPeca(apre);
-        let total = 0;
-        switch (peca.tipo) {
-            case "tragedia":
-                total = 40000;
-                if (apre.audiencia > 30)
-                    total += 1000 * (apre.audiencia - 30);
-                break;
-            case "comedia":
-                total = 30000;
-                if (apre.audiencia > 20)
-                    total += 10000 + 500 * (apre.audiencia - 20);
-                total += 300 * apre.audiencia;
-                break;
-            default:
-                throw new Error(`Peça desconhecida: ${peca.tipo}`);
-        }
-        return total;
-    }
+    function getPeca(apre) { return pecas[apre.id]; }
 
     // calcula créditos de uma apresentação
     function calcularCredito(apre) {
@@ -63,19 +61,14 @@ function gerarFaturaStr(fatura, pecas) {
     }
 
     for (let apre of fatura.apresentacoes) {
-        const total = calcularTotalApresentacao(apre);
+        const total = calcularTotalApresentacao(apre, pecas);
 
-        // acumula créditos
         creditos    += calcularCredito(apre);
         totalFatura += total;
-
-        // adiciona linha formatada
         faturaStr   += montarLinhaFatura(apre, total);
     }
 
-    // adiciona resumo formatado
     faturaStr += montarResumo(totalFatura, creditos);
-
     return faturaStr;
 }
 
