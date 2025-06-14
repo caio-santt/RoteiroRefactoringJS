@@ -1,5 +1,5 @@
 // util.js
-// Função para formatar valores em reais (BRL)
+// Função utilitária para formatar valores em reais (BRL)
 function formatarMoeda(valor) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
